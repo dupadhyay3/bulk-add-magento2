@@ -170,7 +170,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
             });
         });
 
-        $(".qty").each( function(){
+        $("input.input-text.qty").each( function(){
             if($(this).val() < 1 && $(this).val() == 0){
                 $(this).parents('.field').next('button[type="submit"]').attr('disable', true);
                 $(this).parents('.field').next('button[type="submit"]').addClass("disable disabled");
@@ -181,16 +181,26 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
             }
         });
 
-        $(".qty").keyup( function(){
+        $("input.input-text.qty").keyup( function(){
             $(this).each( function(){
-                if($(this).val() < 1 && $(this).val() == 0){
-                    $(this).parents('.field').next('button[type="submit"]').attr('disable', true);
-                    $(this).parents('.field').next('button[type="submit"]').addClass("disable disabled");
-                }
-                else{
-                    $(this).parents('.field').next('button[type="submit"]').attr('disable', false);
-                    $(this).parents('.field').next('button[type="submit"]').removeClass("disable disabled");
-                }
+                var swatch = 'div.swatch-opt-' + $(this).val();
+                $(this).parents('div.product-item-inner').prev('script').prev(swatch).find('div.swatch-attribute').each(function(){
+                    var attr = $(this).parents('div.product-item-inner').prev('script').prev(swatch).find('div.swatch-attribute').attr('option-selected');    
+                    if (typeof attr == typeof undefined) {
+                        alert(attr);
+                        $(this).parents('.field').next('button[type="submit"]').attr('disable', true);
+                        $(this).parents('.field').next('button[type="submit"]').addClass("disable disabled");
+                    }else{
+                        if($(this).val() < 1 && $(this).val() == 0){
+                            $(this).parents('.field').next('button[type="submit"]').attr('disable', true);
+                            $(this).parents('.field').next('button[type="submit"]').addClass("disable disabled");
+                        }
+                        else{
+                            $(this).parents('.field').next('button[type="submit"]').attr('disable', false);
+                            $(this).parents('.field').next('button[type="submit"]').removeClass("disable disabled");
+                        }
+                    }
+                });
             });
         });
     });
