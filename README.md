@@ -1,0 +1,1 @@
+# bulk-add-magento2
