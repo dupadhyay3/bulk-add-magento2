@@ -99,7 +99,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                                     <?php if ($_product->isSaleable()): ?>
                                         <?php $postParams = $block->getAddToCartPostParams($_product); ?>
                                         <form id="bulkaddtocart-<?php echo $block->escapeHtml($itemId) ?>" name="addcart" data-mage-init='{"validation":{}}' data-role="tocart-form" data-product-sku="<?= $block->escapeHtml($_product->getSku()) ?>" action="<?= /* @NoEscape */ $postParams['action'] ?>" method="post">
-                                            <input type="hidden" name="product[]" value="<?= /* @escapeNotVerified */ $postParams['data']['product'] ?>">
+                                            <input type="hidden" name="product" value="<?= /* @escapeNotVerified */ $postParams['data']['product'] ?>">
                                             <input type="hidden" name="<?= /* @escapeNotVerified */ Action::PARAM_NAME_URL_ENCODED ?>" value="<?= /* @escapeNotVerified */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
                                             <?= $block->getBlockHtml('formkey') ?>
                                             <div class="field qty">
@@ -170,7 +170,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                 }
             });
         });
-        
+
         $("input.input-text.qty").each( function(){
             if($(this).val() < 1 && $(this).val() == 0){
                 $(this).parents('.field').next('button[type="submit"]').attr('disable', true);
