@@ -170,7 +170,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                 }
             });
         });
-
+        
         $("input.input-text.qty").each( function(){
             if($(this).val() < 1 && $(this).val() == 0){
                 $(this).parents('.field').next('button[type="submit"]').attr('disable', true);
