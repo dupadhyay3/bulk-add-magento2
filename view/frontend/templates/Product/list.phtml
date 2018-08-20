@@ -93,7 +93,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                         <?= /* @escapeNotVerified */ $block->getProductPrice($_product) ?>
                         <?= $block->getProductDetailsHtml($_product) ?>
                         
-                        <div class="product-item-inner">
+                        <div class="product-item-inner" prodid="<?php echo $_product->getId(); ?>">
                             <div class="product actions product-item-actions"<?= strpos($pos, $viewMode . '-actions') ? $position : '' ?>>
                                 <div class="actions-primary"<?= strpos($pos, $viewMode . '-primary') ? $position : '' ?>>
                                     <?php if ($_product->isSaleable()): ?>
@@ -105,7 +105,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                                             <div class="field qty">
 												<label class="label" for="qty"><span>Qty</span></label>
 												<div class="control">
-													<input id="<?php echo $block->escapeHtml($itemId) ?>" type="number" name="qty" value="0" title="Qty" class="input-text qty" data-validate="{'required-number':true,'validate-item-quantity':{'minAllowed':1}}">
+													<input id="<?php echo $block->escapeHtml($itemId) ?>" type="number" min="0" name="qty" value="0" title="Qty" class="input-text qty" data-validate="{'required-number':true,'validate-item-quantity':{'minAllowed':1}, 'validate-not-negative-number':true}">
 												</div>
 											</div>
                                             <button type="submit"
@@ -142,7 +142,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                 <?= ($iterator == count($_productCollection)+1) ? '</li>' : '' ?>
             <?php endforeach; ?>
         </ol>
-    </div>
+    </div>	
     <?= $block->getToolbarHtml() ?>
     <?php if (!$block->isRedirectToCartEnabled()) : ?>
         <script type="text/x-magento-init">
@@ -159,20 +159,80 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
 <script>
     require(['jquery'], 
     function($){
-
         $("button.bulkadd").click(function(){
             $("input.input-text.qty").each( function(){ 
                 if($(this).val() >= 1 && $(this).val() != 0){
                     var formid = "#bulkaddtocart-" + $(this).attr('id');
                     if ($(formid).valid()) {
+						if($('.product-item-actions').find('.mage-error').length > 0) {
+							$('.product-item-actions').find('.mage-error').each( function(){
+								var curElem = $(this);
+								var curProdIdDetail = $(this).closest('div[class*="product-item-inner"]').attr('prodid');
+								var movedElem = $(this).attr("for");
+								if(typeof movedElem !== "undefined" && movedElem !== null) {
+									var findRespectedElem = movedElem.substring(
+										movedElem.lastIndexOf("[") + 1, 
+										movedElem.lastIndexOf("]")
+									);
+									var respectedNewElem = curElem.closest('div[class*="product-item-details"]').find('.swatch-attribute');
+									respectedNewElem.each( function(){
+										var curAttrId = $(this).attr("attribute-id");
+										if(curAttrId == findRespectedElem) {
+											$(this).find('.mage-error').each( function(){
+												if($(this).attr("productid") != "") {
+													$(this).remove();
+												}
+											});
+											curElem.attr("productid",curProdIdDetail);
+											$(curElem).clone().appendTo($(this));
+										}
+									});
+								}
+							});
+						}
                         $(formid).submit();
-                    }
+                        setTimeout( function() {
+							$(formid)[0].reset();
+							$(formid).closest('div[class*="product-item-inner"]').closest('div[class*="product-item-details"]').find('.swatch-attribute').each( function(){
+								$(this).find('.swatch-option').each( function(){
+									$(this).removeClass("selected");
+								});
+							});
+						}, 1000);
+                    } else {
+						if($('.product-item-actions').find('.mage-error').length > 0) {
+							$('.product-item-actions').find('.mage-error').each( function(){
+								var curElem = $(this);
+								var curProdIdDetail = $(this).closest('div[class*="product-item-inner"]').attr('prodid');
+								var movedElem = $(this).attr("for");
+								if(typeof movedElem !== "undefined" && movedElem !== null) {
+									var findRespectedElem = movedElem.substring(
+										movedElem.lastIndexOf("[") + 1, 
+										movedElem.lastIndexOf("]")
+									);
+									var respectedNewElem = curElem.closest('div[class*="product-item-details"]').find('.swatch-attribute');
+									respectedNewElem.each( function(){
+										var curAttrId = $(this).attr("attribute-id");
+										if(curAttrId == findRespectedElem) {
+											$(this).find('.mage-error').each( function(){
+												if($(this).attr("productid") != "") {
+													$(this).remove();
+												}
+											});
+											curElem.attr("productid",curProdIdDetail);
+											$(curElem).clone().appendTo($(this));
+										}
+									});
+								}
+							});
+						}
+					}
                 }
             });
         });
 
         $("input.input-text.qty").each( function(){
-            if($(this).val() < 1 && $(this).val() == 0){
+            if($(this).val() < 1 && $(this).val() <= 0){
                 $(this).parents('.field').next('button[type="submit"]').attr('disable', true);
                 $(this).parents('.field').next('button[type="submit"]').addClass("disable disabled");
             }
@@ -184,7 +244,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
 
         $("input.input-text.qty").keyup( function(){
             $(this).each( function(){
-                if($(this).val() < 1 && $(this).val() == 0){
+                if($(this).val() < 1 && $(this).val() <= 0){
                     $(this).parents('.field').next('button[type="submit"]').attr('disable', true);
                     $(this).parents('.field').next('button[type="submit"]').addClass("disable disabled");
                 }
@@ -194,5 +254,22 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                 }
             });
         });
+        
+        function formSubmitAfter() {
+			$("input.input-text.qty").each( function(){
+				if($(this).val() < 1 && $(this).val() <= 0){
+					$(this).parents('.field').next('button[type="submit"]').attr('disable', true);
+					$(this).parents('.field').next('button[type="submit"]').addClass("disable disabled");
+				}
+				else{
+					$(this).parents('.field').next('button[type="submit"]').attr('disable', false);
+					$(this).parents('.field').next('button[type="submit"]').removeClass("disable disabled");
+				}
+			});
+		}
+		
+		$(document).ajaxComplete(function() {
+			formSubmitAfter();
+		});
     });
 </script>
