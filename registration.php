@@ -2,7 +2,7 @@
 /**
  * Atharva Bulkadd module registration.
  *
- * PHP version 7.0
+ * PHP version 7.0, 7.1
  * 
  * @category PHP
  * @package  Atharva_Bulkadd

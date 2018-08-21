@@ -50,16 +50,16 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                         right: 0;
                         background: #f5f5f5;
                         border-top: 1px #ccc solid;
-                        padding: 0 20px;
+                        padding: 10px 20px;
                         line-height: 1.42857143;
                         margin: 13px 0 0 0;
                         display: inline-block;
                         width: 100%;
-                        z-index: 99;">
+                        z-index: 99;
+                        text-align:center;">
                 <button type="submit"
                     title="<?= $block->escapeHtml(__('Add to Bulk Cart')) ?>"
-                    class="action tocart primary bulkadd"
-                    style="float:right;">
+                    class="action tocart primary bulkadd">
                     <span><?= /* @escapeNotVerified */ __('Add to Bulk Cart') ?></span>
                 </button>
             </div>
