@@ -3,7 +3,7 @@
  * Atharva Bulkadd module registration.
  *
  * PHP version 7.0, 7.1
- * 
+ *
  * @category PHP
  * @package  Atharva_Bulkadd
  * @author   expert <expertdev9@gmail.com>
